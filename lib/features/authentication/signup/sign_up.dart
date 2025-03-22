@@ -32,7 +32,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _register() async {
-    if (_formKey.currentState!.validate()) {
+    final isValid = _formKey.currentState!.validate();
+    if (isValid) {
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
       final success = await authProvider.register(
         _nameController.text.trim(),
@@ -50,7 +51,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
-        Navigator.pushReplacementNamed(context, LoginScreen.routeName);
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          LoginScreen.routeName,
+          (route) => false,
+        );
       }
     }
   }
@@ -134,10 +139,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       obscureText: !_isPasswordVisible,
                       validator: (value) {
-                        if (value == null || value.isEmpty) {
+                        final trimmed = value?.trim() ?? '';
+                        if (trimmed.isEmpty) {
                           return l10n.requiredField;
                         }
-                        if (value.length < 6) {
+                        if (trimmed.length < 8) {
                           return l10n.passwordTooShort;
                         }
                         return null;
@@ -156,9 +162,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         if (value == null || value.isEmpty) {
                           return l10n.requiredField;
                         }
-                        if (value != _passwordController.text) {
+                        if ((value.trim()) != _passwordController.text.trim()) {
                           return l10n.passwordNotMatch;
                         }
+
                         return null;
                       },
                     ),
