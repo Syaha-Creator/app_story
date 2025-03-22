@@ -23,7 +23,7 @@ class ApiService {
       final Map<String, dynamic> data = jsonDecode(response.body);
       if (data['error'] == false) {
         final user = User.fromJson(data['loginResult']);
-        // Save token to shared preferences
+
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString(Constants.tokenKey, user.token);
         await prefs.setBool(Constants.isLoggedInKey, true);
