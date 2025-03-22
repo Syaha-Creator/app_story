@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-import '../repositories/story_model.dart';
+import '../models/story_model.dart';
 import '../services/api_service.dart';
 
 class StoryProvider with ChangeNotifier {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../repositories/story_model.dart';
+import '../../../../models/story_model.dart';
 import 'cached_network_image.dart';
 
 class StoryItem extends StatelessWidget {

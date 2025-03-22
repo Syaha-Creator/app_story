@@ -4,8 +4,8 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../repositories/story_model.dart';
-import '../repositories/user_model.dart';
+import '../models/story_model.dart';
+import '../models/user_model.dart';
 import '../utils/constant/constant.dart';
 
 class ApiService {
