@@ -21,5 +21,7 @@
   "passwordNotMatch": "Passwords do not match",
   "requiredField": "This field is required",
   "invalidEmail": "Please enter a valid email",
-  "passwordTooShort": "Password must be at least 8 characters"
+  "passwordTooShort": "Password must be at least 8 characters",
+  "refreshSuccess": "Stories refreshed successfully!",
+  "locationPaidOnly": "Location feature is only available in Paid version."
 }

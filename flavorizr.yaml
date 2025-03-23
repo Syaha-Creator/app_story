@@ -1,0 +1,15 @@
+flavors:
+  free:
+    app:
+      name: "MyApp Free"
+    android:
+      applicationId: "com.syahrul.app_story.free"
+    ios:
+      bundleId: "com.syahrul.app_story.free"
+  paid:
+    app:
+      name: "MyApp Paid"
+    android:
+      applicationId: "com.syahrul.app_story.paid"
+    ios:
+      bundleId: "com.syahrul.app_story.paid"

@@ -21,5 +21,7 @@
   "passwordNotMatch": "Kata sandi tidak cocok",
   "requiredField": "Kolom ini wajib diisi",
   "invalidEmail": "Masukkan email yang valid",
-  "passwordTooShort": "Kata sandi minimal 8 karakter"
+  "passwordTooShort": "Kata sandi minimal 8 karakter",
+  "refreshSuccess": "Cerita berhasil diperbarui!",
+  "locationPaidOnly": "Fitur lokasi hanya tersedia di versi Berbayar."
 }

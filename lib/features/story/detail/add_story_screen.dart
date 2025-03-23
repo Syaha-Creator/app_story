@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../../flavors.dart';
 import '../../../providers/story_provider.dart';
+import '../location/choose_location.dart';
 
 class AddStoryScreen extends StatefulWidget {
   final VoidCallback onStoryAdded;
@@ -21,6 +24,8 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
   final _descriptionController = TextEditingController();
   File? _image;
   final ImagePicker _picker = ImagePicker();
+  LatLng? _selectedLocation;
+  String? _selectedAddress;
 
   @override
   void dispose() {
@@ -46,9 +51,13 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
   void _uploadStory() async {
     if (_formKey.currentState!.validate() && _image != null) {
       final storyProvider = Provider.of<StoryProvider>(context, listen: false);
+      final isPaid = F.appFlavor.isPaid;
+
       final success = await storyProvider.addStory(
         _image!,
         _descriptionController.text.trim(),
+        location: isPaid ? _selectedLocation : null,
+        address: isPaid ? _selectedAddress : null,
       );
 
       if (success && mounted) {
@@ -67,9 +76,25 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
     }
   }
 
+  Future<void> _pickLocation() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LocationPickerPage()),
+    );
+
+    if (result != null && result is Map<String, dynamic>) {
+      setState(() {
+        _selectedLocation = result['location'] as LatLng;
+        _selectedAddress = result['address'] as String;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final isPaid = F.appFlavor.isPaid;
+
     return Scaffold(
       appBar: AppBar(title: Text(l10n.addStory)),
       body: Consumer<StoryProvider>(
@@ -162,6 +187,29 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                       return null;
                     },
                   ),
+                  const SizedBox(height: 24),
+                  if (isPaid)
+                    ElevatedButton.icon(
+                      onPressed: _pickLocation,
+                      icon: const Icon(Icons.location_on),
+                      label: Text(
+                        _selectedAddress ?? 'Select Location',
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                    )
+                  else
+                    Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      child: Text(
+                        l10n.locationPaidOnly,
+                        style: TextStyle(color: Colors.grey[700]),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   const SizedBox(height: 24),
                   ElevatedButton(
                     onPressed: storyProvider.isLoading ? null : _uploadStory,
