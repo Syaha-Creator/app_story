@@ -3,12 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../providers/auth_provider.dart';
-import '../signin/sign_in.dart';
 
 class RegisterScreen extends StatefulWidget {
-  static const routeName = '/register';
+  final VoidCallback onRegisterSuccess;
 
-  const RegisterScreen({super.key});
+  const RegisterScreen({super.key, required this.onRegisterSuccess});
 
   @override
   State<RegisterScreen> createState() => _RegisterScreenState();
@@ -51,11 +50,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
         );
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          LoginScreen.routeName,
-          (route) => false,
-        );
+        if (mounted) widget.onRegisterSuccess();
       }
     }
   }
@@ -64,7 +59,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.register)),
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {
           return Center(
@@ -199,9 +193,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                     const SizedBox(height: 16),
                     TextButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+                      onPressed: widget.onRegisterSuccess,
                       child: Text(l10n.alreadyHaveAccount),
                     ),
                   ],

@@ -3,13 +3,16 @@ import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import '../../../providers/auth_provider.dart';
-import '../../story/home/home.dart';
-import '../signup/sign_up.dart';
 
 class LoginScreen extends StatefulWidget {
-  static const routeName = '/login';
+  final VoidCallback onLoginSuccess;
+  final VoidCallback onRegisterNavigate;
 
-  const LoginScreen({super.key});
+  const LoginScreen({
+    super.key,
+    required this.onLoginSuccess,
+    required this.onRegisterNavigate,
+  });
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -37,11 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (success && mounted) {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          HomeScreen.routeName,
-          (route) => false,
-        );
+        widget.onLoginSuccess();
       }
     }
   }
@@ -50,7 +49,6 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.login)),
       body: Consumer<AuthProvider>(
         builder: (context, authProvider, _) {
           return Center(
@@ -149,9 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     const SizedBox(height: 16),
                     TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, RegisterScreen.routeName);
-                      },
+                      onPressed: widget.onRegisterNavigate,
                       child: Text(l10n.dontHaveAccount),
                     ),
                   ],

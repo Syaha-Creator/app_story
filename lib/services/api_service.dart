@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -27,6 +26,8 @@ class ApiService {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString(Constants.tokenKey, user.token);
         await prefs.setBool(Constants.isLoggedInKey, true);
+        await prefs.setString('userId', user.userId);
+        await prefs.setString('userName', user.name);
         return user;
       } else {
         throw Exception(data['message']);
@@ -50,6 +51,21 @@ class ApiService {
     } else {
       throw Exception(data['message'] ?? 'Failed to register');
     }
+  }
+
+  Future<User?> getUserFromPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(Constants.tokenKey);
+    final userId = prefs.getString('userId');
+    final userName = prefs.getString('userName');
+
+    if (token != null &&
+        token.isNotEmpty &&
+        userId != null &&
+        userName != null) {
+      return User(userId: userId, name: userName, token: token);
+    }
+    return null;
   }
 
   // Stories endpoints
@@ -124,6 +140,8 @@ class ApiService {
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(Constants.tokenKey);
+    await prefs.remove('userId');
+    await prefs.remove('userName');
     await prefs.setBool(Constants.isLoggedInKey, false);
   }
 

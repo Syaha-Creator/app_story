@@ -8,9 +8,9 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../../../providers/story_provider.dart';
 
 class AddStoryScreen extends StatefulWidget {
-  static const routeName = '/add-story';
+  final VoidCallback onStoryAdded;
 
-  const AddStoryScreen({super.key});
+  const AddStoryScreen({super.key, required this.onStoryAdded});
 
   @override
   State<AddStoryScreen> createState() => _AddStoryScreenState();
@@ -55,7 +55,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Story uploaded successfully')),
         );
-        Navigator.pop(context);
+        widget.onStoryAdded();
       }
     } else if (_image == null) {
       ScaffoldMessenger.of(context).showSnackBar(

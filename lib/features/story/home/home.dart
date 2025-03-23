@@ -4,16 +4,20 @@ import 'package:provider/provider.dart';
 
 import '../../../providers/auth_provider.dart';
 import '../../../providers/story_provider.dart';
-import '../../authentication/signin/sign_in.dart';
-import '../detail/add_story_screen.dart';
-import '../detail/story_detail_screen.dart';
 import 'widgets/language_dropdown.dart';
 import 'widgets/story_item.dart';
 
 class HomeScreen extends StatefulWidget {
-  static const routeName = '/home';
+  final VoidCallback onLogout;
+  final VoidCallback onAddStoryNavigate;
+  final Function(String id) onStoryTap;
 
-  const HomeScreen({super.key});
+  const HomeScreen({
+    super.key,
+    required this.onLogout,
+    required this.onAddStoryNavigate,
+    required this.onStoryTap,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -39,9 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _logout() async {
     await Provider.of<AuthProvider>(context, listen: false).logout();
-    if (mounted) {
-      Navigator.pushReplacementNamed(context, LoginScreen.routeName);
-    }
+    if (mounted) widget.onLogout();
   }
 
   @override
@@ -103,13 +105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 final story = storyProvider.stories[index];
                 return StoryItem(
                   story: story,
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      StoryDetailScreen.routeName,
-                      arguments: story.id,
-                    );
-                  },
+                  onTap: () => widget.onStoryTap(story.id),
                 );
               },
             );
@@ -118,9 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, AddStoryScreen.routeName);
-        },
+        onPressed: widget.onAddStoryNavigate,
         tooltip: l10n.addStory,
         child: const Icon(Icons.add),
       ),

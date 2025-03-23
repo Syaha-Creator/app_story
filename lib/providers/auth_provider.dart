@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../models/user_model.dart';
 import '../services/api_service.dart';
 
@@ -7,15 +6,33 @@ class AuthProvider with ChangeNotifier {
   final ApiService _apiService = ApiService();
   User? _user;
   bool _isLoading = false;
+  bool _isCheckingAuth = true;
+  bool _hasInitialized = false;
   String _errorMessage = '';
 
   User? get user => _user;
   bool get isLoading => _isLoading;
+  bool get isCheckingAuth => _isCheckingAuth;
   String get errorMessage => _errorMessage;
 
-  Future<bool> checkLoginStatus() async {
+  AuthProvider() {
+    initAuth();
+  }
+
+  Future<void> initAuth() async {
+    if (_hasInitialized) return;
+    _hasInitialized = true;
+
+    _isCheckingAuth = true;
+    notifyListeners();
+
     final isLoggedIn = await _apiService.isLoggedIn();
-    return isLoggedIn;
+    if (isLoggedIn) {
+      _user = await _apiService.getUserFromPreferences();
+    }
+
+    _isCheckingAuth = false;
+    notifyListeners();
   }
 
   Future<bool> login(String email, String password) async {

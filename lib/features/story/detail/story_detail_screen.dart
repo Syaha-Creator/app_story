@@ -6,9 +6,9 @@ import '../../../providers/story_provider.dart';
 import '../home/widgets/cached_network_image.dart';
 
 class StoryDetailScreen extends StatefulWidget {
-  static const routeName = '/story-detail';
+  final String storyId;
 
-  const StoryDetailScreen({super.key});
+  const StoryDetailScreen({super.key, required this.storyId});
 
   @override
   State<StoryDetailScreen> createState() => _StoryDetailScreenState();
@@ -19,13 +19,11 @@ class _StoryDetailScreenState extends State<StoryDetailScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
 
-    final storyId = ModalRoute.of(context)?.settings.arguments as String;
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<StoryProvider>(
         context,
         listen: false,
-      ).fetchStoryDetail(storyId);
+      ).fetchStoryDetail(widget.storyId);
     });
   }
 

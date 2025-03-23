@@ -59,7 +59,7 @@ class StoryProvider with ChangeNotifier {
       _isLoading = false;
 
       if (success) {
-        await fetchStories(); // Refresh the stories list after adding
+        await fetchStories();
       }
 
       notifyListeners();
