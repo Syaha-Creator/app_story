@@ -23,15 +23,18 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => StoryProvider()),
       ],
+      child: Builder(
+        builder: (context) {
+          final localeProvider = Provider.of<LocaleProvider>(context);
+          final routerDelegate = AppRouterDelegate();
+          final routeInformationParser = AppRouteInformationParser();
 
-      child: Consumer<LocaleProvider>(
-        builder: (context, localeProvider, _) {
           return MaterialApp.router(
             title: 'Story App',
             theme: ThemeData(
+              useMaterial3: true,
               primarySwatch: Colors.blue,
               visualDensity: VisualDensity.adaptivePlatformDensity,
-              useMaterial3: true,
               appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
               elevatedButtonTheme: ElevatedButtonThemeData(
                 style: ElevatedButton.styleFrom(
@@ -43,8 +46,8 @@ class MyApp extends StatelessWidget {
                 ),
               ),
             ),
-            routerDelegate: AppRouterDelegate(context),
-            routeInformationParser: AppRouteInformationParser(),
+            routerDelegate: routerDelegate,
+            routeInformationParser: routeInformationParser,
             localizationsDelegates: LocalizationSetup.localizationsDelegates,
             supportedLocales: LocalizationSetup.supportedLocales,
             locale: localeProvider.locale,

@@ -8,12 +8,20 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../flavors.dart';
 import '../../../providers/story_provider.dart';
-import '../location/choose_location.dart';
 
 class AddStoryScreen extends StatefulWidget {
   final VoidCallback onStoryAdded;
+  final VoidCallback onPickLocationNavigate;
+  final LatLng? selectedLocation;
+  final String? selectedAddress;
 
-  const AddStoryScreen({super.key, required this.onStoryAdded});
+  const AddStoryScreen({
+    super.key,
+    required this.onStoryAdded,
+    required this.onPickLocationNavigate,
+    this.selectedLocation,
+    this.selectedAddress,
+  });
 
   @override
   State<AddStoryScreen> createState() => _AddStoryScreenState();
@@ -24,8 +32,6 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
   final _descriptionController = TextEditingController();
   File? _image;
   final ImagePicker _picker = ImagePicker();
-  LatLng? _selectedLocation;
-  String? _selectedAddress;
 
   @override
   void dispose() {
@@ -56,8 +62,8 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
       final success = await storyProvider.addStory(
         _image!,
         _descriptionController.text.trim(),
-        location: isPaid ? _selectedLocation : null,
-        address: isPaid ? _selectedAddress : null,
+        location: isPaid ? widget.selectedLocation : null,
+        address: isPaid ? widget.selectedAddress : null,
       );
 
       if (success && mounted) {
@@ -73,20 +79,6 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
           backgroundColor: Colors.red,
         ),
       );
-    }
-  }
-
-  Future<void> _pickLocation() async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const LocationPickerPage()),
-    );
-
-    if (result != null && result is Map<String, dynamic>) {
-      setState(() {
-        _selectedLocation = result['location'] as LatLng;
-        _selectedAddress = result['address'] as String;
-      });
     }
   }
 
@@ -190,10 +182,10 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                   const SizedBox(height: 24),
                   if (isPaid)
                     ElevatedButton.icon(
-                      onPressed: _pickLocation,
+                      onPressed: widget.onPickLocationNavigate,
                       icon: const Icon(Icons.location_on),
                       label: Text(
-                        _selectedAddress ?? 'Select Location',
+                        widget.selectedAddress ?? 'Select Location',
                         overflow: TextOverflow.ellipsis,
                       ),
                       style: ElevatedButton.styleFrom(
@@ -239,7 +231,7 @@ class _AddStoryScreenState extends State<AddStoryScreen> {
                   if (storyProvider.errorMessage.isNotEmpty)
                     Container(
                       padding: const EdgeInsets.all(8),
-                      color: Theme.of(context).colorScheme.error.withAlpha(50),
+                      color: Theme.of(context).colorScheme.error.withAlpha(13),
                       child: Text(
                         storyProvider.errorMessage,
                         style: TextStyle(

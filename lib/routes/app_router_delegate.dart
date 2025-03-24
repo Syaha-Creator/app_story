@@ -7,6 +7,7 @@ import '../features/authentication/signup/sign_up.dart';
 import '../features/story/detail/add_story_screen.dart';
 import '../features/story/detail/story_detail_screen.dart';
 import '../features/story/home/home.dart';
+import '../features/story/location/choose_location.dart';
 import '../providers/auth_provider.dart';
 import 'app_page_config.dart';
 
@@ -18,57 +19,114 @@ class AppRouterDelegate extends RouterDelegate<AppPageConfig>
   String _currentPath = AppPageConfig.loginPath;
   String? _selectedStoryId;
 
-  AppRouterDelegate(BuildContext context);
+  LatLng? _pickedLatLng;
+  String? _pickedAddress;
+
+  void _handleLocationPicked(LatLng location, String address) {
+    _pickedLatLng = location;
+    _pickedAddress = address;
+    _navigateToAddStory();
+  }
+
+  void _navigateToLogin() {
+    _currentPath = AppPageConfig.loginPath;
+    _selectedStoryId = null;
+    notifyListeners();
+  }
+
+  void _navigateToRegister() {
+    _currentPath = AppPageConfig.registerPath;
+    _selectedStoryId = null;
+    notifyListeners();
+  }
+
+  void _navigateToHome() {
+    _currentPath = AppPageConfig.homePath;
+    _selectedStoryId = null;
+    _pickedLatLng = null;
+    _pickedAddress = null;
+    notifyListeners();
+  }
+
+  void _navigateToAddStory() {
+    _currentPath = AppPageConfig.addStoryPath;
+    notifyListeners();
+  }
+
+  void _navigateToPickLocation() {
+    _currentPath = AppPageConfig.pickLocationPath;
+    notifyListeners();
+  }
+
+  void _navigateToStoryDetail(String id) {
+    _selectedStoryId = id;
+    _currentPath = AppPageConfig.storyDetailPath;
+    notifyListeners();
+  }
+
+  void _handleBack() {
+    if (_currentPath == AppPageConfig.registerPath ||
+        _currentPath == AppPageConfig.addStoryPath ||
+        _currentPath == AppPageConfig.storyDetailPath ||
+        _currentPath == AppPageConfig.pickLocationPath) {
+      _navigateToHome();
+    } else {
+      _navigateToLogin();
+    }
+  }
+
+  Page _buildPage(Widget child, String keyName) {
+    return MaterialPage(child: child, key: ValueKey(keyName));
+  }
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
+    final authProvider = Provider.of<AuthProvider>(context, listen: true);
     final isLoggedIn = authProvider.user != null;
-    LatLng? _pickedLatLng;
-    String? _pickedAddress;
 
     List<Page> stack = [];
 
     if (!isLoggedIn) {
-      switch (_currentPath) {
-        case AppPageConfig.registerPath:
-          stack.add(
-            MaterialPage(
-              child: RegisterScreen(
-                onRegisterSuccess: _navigateToLoginWithDelay,
-              ),
-              key: const ValueKey('RegisterPage'),
+      if (_currentPath == AppPageConfig.registerPath) {
+        stack.add(
+          _buildPage(
+            RegisterScreen(onRegisterSuccess: _navigateToLogin),
+            'RegisterPage',
+          ),
+        );
+      } else {
+        stack.add(
+          _buildPage(
+            LoginScreen(
+              onLoginSuccess: _navigateToHome,
+              onRegisterNavigate: _navigateToRegister,
             ),
-          );
-          break;
-        default:
-          stack.add(
-            MaterialPage(
-              child: LoginScreen(
-                onLoginSuccess: _navigateToHome,
-                onRegisterNavigate: _navigateToRegister,
-              ),
-              key: const ValueKey('LoginPage'),
-            ),
-          );
+            'LoginPage',
+          ),
+        );
       }
     } else {
       stack.add(
-        MaterialPage(
-          child: HomeScreen(
+        _buildPage(
+          HomeScreen(
             onAddStoryNavigate: _navigateToAddStory,
             onLogout: _navigateToLogin,
             onStoryTap: _navigateToStoryDetail,
           ),
-          key: const ValueKey('HomePage'),
+          'HomePage',
         ),
       );
 
       if (_currentPath == AppPageConfig.addStoryPath) {
         stack.add(
-          MaterialPage(
-            child: AddStoryScreen(onStoryAdded: _navigateToHome),
-            key: const ValueKey('AddStoryPage'),
+          _buildPage(
+            AddStoryScreen(
+              onStoryAdded: _navigateToHome,
+              selectedLocation: _pickedLatLng,
+              selectedAddress: _pickedAddress,
+              onPickLocationNavigate: _navigateToPickLocation,
+            ),
+            'AddStoryPage',
           ),
         );
       }
@@ -76,9 +134,18 @@ class AppRouterDelegate extends RouterDelegate<AppPageConfig>
       if (_currentPath == AppPageConfig.storyDetailPath &&
           _selectedStoryId != null) {
         stack.add(
-          MaterialPage(
-            child: StoryDetailScreen(storyId: _selectedStoryId!),
-            key: ValueKey('StoryDetail-${_selectedStoryId!}'),
+          _buildPage(
+            StoryDetailScreen(storyId: _selectedStoryId!),
+            'StoryDetail-${_selectedStoryId!}',
+          ),
+        );
+      }
+
+      if (_currentPath == AppPageConfig.pickLocationPath) {
+        stack.add(
+          _buildPage(
+            LocationPickerPage(onLocationSelected: _handleLocationPicked),
+            'LocationPickerPage',
           ),
         );
       }
@@ -93,65 +160,6 @@ class AppRouterDelegate extends RouterDelegate<AppPageConfig>
         return true;
       },
     );
-  }
-
-  void _navigateToHome() {
-    _currentPath = AppPageConfig.homePath;
-    _selectedStoryId = null;
-    notifyListeners();
-  }
-
-  void _navigateToLogin() {
-    _currentPath = AppPageConfig.loginPath;
-    _selectedStoryId = null;
-    notifyListeners();
-  }
-
-  Future<void> _navigateToLoginWithDelay() async {
-    _navigateToLogin();
-  }
-
-  void _navigateToRegister() {
-    _currentPath = AppPageConfig.registerPath;
-    _selectedStoryId = null;
-    notifyListeners();
-  }
-
-  void _navigateToAddStory() {
-    _currentPath = AppPageConfig.addStoryPath;
-    notifyListeners();
-  }
-
-  void _navigateToStoryDetail(String id) {
-    _selectedStoryId = id;
-    _currentPath = AppPageConfig.storyDetailPath;
-    notifyListeners();
-  }
-
-  void _handleBack() {
-    if (_currentPath != AppPageConfig.homePath) {
-      _navigateToHome();
-    }
-  }
-
-  void _navigateToPickLocation() {
-    _currentPath = AppPageConfig.pickLocationPath;
-    if (_currentPath == AppPageConfig.pickLocationPath) {
-      stack.add(
-        MaterialPage(
-          child: LocationPickerPage(
-            onLocationPicked: (LatLng latLng, String address) {
-              _pickedLatLng = latLng;
-              _pickedAddress = address;
-              _navigateToAddStory(); // kembali ke AddStory dengan data
-            },
-          ),
-          key: const ValueKey('PickLocationPage'),
-        ),
-      );
-    }
-
-    notifyListeners();
   }
 
   @override

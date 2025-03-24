@@ -23,5 +23,7 @@
   "invalidEmail": "Please enter a valid email",
   "passwordTooShort": "Password must be at least 8 characters",
   "refreshSuccess": "Stories refreshed successfully!",
-  "locationPaidOnly": "Location feature is only available in Paid version."
+  "locationPaidOnly": "Location feature is only available in Paid version.",
+  "storyUploadSuccess": "Story uploaded successfully",
+  "imageRequired": "Please select an image"
 }

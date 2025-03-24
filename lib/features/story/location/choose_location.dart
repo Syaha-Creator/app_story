@@ -3,7 +3,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 
 class LocationPickerPage extends StatefulWidget {
-  const LocationPickerPage({super.key});
+  final void Function(LatLng location, String address) onLocationSelected;
+
+  const LocationPickerPage({super.key, required this.onLocationSelected});
 
   @override
   State<LocationPickerPage> createState() => _LocationPickerPageState();
@@ -25,6 +27,7 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
       pos.latitude,
       pos.longitude,
     );
+
     if (placemarks.isNotEmpty) {
       final place = placemarks.first;
       setState(() {
@@ -36,10 +39,7 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
 
   void _confirmSelection() {
     if (_pickedLocation != null && _address != null) {
-      Navigator.pop(context, {
-        'location': _pickedLocation!,
-        'address': _address!,
-      });
+      widget.onLocationSelected(_pickedLocation!, _address!);
     }
   }
 
