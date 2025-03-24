@@ -187,7 +187,12 @@ class _StoryDetailScreenState extends State<StoryDetailScreen> {
                               Marker(
                                 markerId: const MarkerId('story-location'),
                                 position: _location!,
-                                infoWindow: InfoWindow(title: story.name),
+                                infoWindow: InfoWindow(
+                                  title:
+                                      _address.isNotEmpty
+                                          ? _address
+                                          : 'Unknown location',
+                                ),
                               ),
                             },
                             zoomControlsEnabled: false,

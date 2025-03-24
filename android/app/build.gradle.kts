@@ -1,7 +1,10 @@
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file("local.properties")
+import java.util.Properties
+import java.io.FileInputStream
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
 if (localPropertiesFile.exists()) {
-    localProperties.load(new FileInputStream(localPropertiesFile))
+    localProperties.load(FileInputStream(localPropertiesFile))
 }
 
 plugins {
@@ -34,7 +37,7 @@ android {
         targetSdk = 35
         versionCode = flutter.versionCode
         versionName = flutter.versionName
-        manifestPlaceholders = [ mapsApiKey: localProperties['MAPS_API_KEY'] ]
+        manifestPlaceholders["mapsApiKey"] = localProperties.getProperty("MAPS_API_KEY")
     }
 
     buildTypes {

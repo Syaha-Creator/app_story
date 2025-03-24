@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../features/authentication/signin/sign_in.dart';
@@ -23,6 +24,8 @@ class AppRouterDelegate extends RouterDelegate<AppPageConfig>
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProvider>(context);
     final isLoggedIn = authProvider.user != null;
+    LatLng? _pickedLatLng;
+    String? _pickedAddress;
 
     List<Page> stack = [];
 
@@ -129,6 +132,26 @@ class AppRouterDelegate extends RouterDelegate<AppPageConfig>
     if (_currentPath != AppPageConfig.homePath) {
       _navigateToHome();
     }
+  }
+
+  void _navigateToPickLocation() {
+    _currentPath = AppPageConfig.pickLocationPath;
+    if (_currentPath == AppPageConfig.pickLocationPath) {
+      stack.add(
+        MaterialPage(
+          child: LocationPickerPage(
+            onLocationPicked: (LatLng latLng, String address) {
+              _pickedLatLng = latLng;
+              _pickedAddress = address;
+              _navigateToAddStory(); // kembali ke AddStory dengan data
+            },
+          ),
+          key: const ValueKey('PickLocationPage'),
+        ),
+      );
+    }
+
+    notifyListeners();
   }
 
   @override

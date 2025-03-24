@@ -61,9 +61,9 @@ class _LocationPickerPageState extends State<LocationPickerPage> {
                       Marker(
                         markerId: const MarkerId('picked'),
                         position: _pickedLocation!,
-                        onTap: () {
-                          setState(() => _showBottomInfo = true);
-                        },
+                        infoWindow: InfoWindow(
+                          title: _address ?? 'Loading address...',
+                        ),
                       ),
                     }
                     : {},
